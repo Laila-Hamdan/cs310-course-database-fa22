@@ -24,8 +24,26 @@ public class Database {
         
         String result = null;
         
-        // INSERT YOUR CODE HERE
+        // Start of inserted code
         
+        String query = "SELECT * FROM section WHERE termid = ? AND subjectid = ? AND num = ?";
+        
+        try {
+            PreparedStatement prst = connection.prepareStatement(query);
+            
+            prst.setInt(1, termid);
+            prst.setString(2, subjectid);
+            prst.setString(3, num);
+
+            ResultSet rslt = prst.executeQuery();
+
+            result = getResultSetAsJSON(rslt); 
+
+            rslt.close();
+        }
+        catch (Exception e) { e.printStackTrace(); }
+        
+        // end of inserted code
         return result;
         
     }
@@ -34,8 +52,22 @@ public class Database {
         
         int result = 0;
         
-        // INSERT YOUR CODE HERE
+        //Start of inserted code
         
+        String query = "INSERT INTO registration (studentid, termid, crn) VALUES (?, ?, ?)";
+        
+        try {
+            PreparedStatement prst = connection.prepareStatement(query);
+            
+            prst.setInt(1, studentid);
+            prst.setInt(2, termid);
+            prst.setInt(3, crn);
+
+            result = prst.executeUpdate();
+        }
+        catch (Exception e) { e.printStackTrace(); }
+        
+        //end of inserted code
         return result;
         
     }
@@ -44,8 +76,22 @@ public class Database {
         
         int result = 0;
         
-        // INSERT YOUR CODE HERE
+        // Start of inserted code
         
+        String query = "DELETE FROM registration WHERE studentid = ? AND termid = ? AND crn = ?";
+        
+        try {
+            PreparedStatement prst = connection.prepareStatement(query);
+            
+            prst.setInt(1, studentid);
+            prst.setInt(2, termid);
+            prst.setInt(3, crn);
+
+            result = prst.executeUpdate();
+        } 
+        catch (Exception e) { e.printStackTrace(); }
+        
+        // end of inserted code
         return result;
         
     }
@@ -54,8 +100,20 @@ public class Database {
         
         int result = 0;
         
-        // INSERT YOUR CODE HERE
+        // Start of inserted code
+        String query = "DELETE FROM registration WHERE studentid = ? AND termid = ?";
         
+        try {
+            PreparedStatement prst = connection.prepareStatement(query);
+            
+            prst.setInt(1, studentid);
+            prst.setInt(2, termid);
+
+            result = prst.executeUpdate();
+        } 
+        catch (Exception e) { e.printStackTrace(); }
+        
+        // end of inserted code
         return result;
         
     }
@@ -64,8 +122,24 @@ public class Database {
         
         String result = null;
         
-        // INSERT YOUR CODE HERE
+        // Start of inserted code
+        String query = "SELECT * FROM registration r JOIN section s on s.crn = r.crn"+ " WHERE r.studentid = ? AND r.termid = ?";
         
+        try {
+            PreparedStatement prst = connection.prepareStatement(query);
+            
+            prst.setInt(1, studentid);
+            prst.setInt(2, termid);
+            
+            if(prst.execute()){
+                ResultSet resultset = prst.getResultSet();
+                result = getResultSetAsJSON(resultset); 
+            }
+            
+        } 
+        catch (Exception e) { e.printStackTrace(); }
+        
+        // end of inserted code
         return result;
         
     }
@@ -160,9 +234,22 @@ public class Database {
             ResultSetMetaData metadata = resultset.getMetaData();
             int columnCount = metadata.getColumnCount();
             
-            // INSERT YOUR CODE HERE
+            // Start of inserted code
+      
+            while (resultset.next()) {
+                JSONObject obj = new JSONObject();
+                for (int i = 1; i <= columnCount; i++) {
+                    String key = metadata.getColumnName(i);
+                    String value = resultset.getString(i);
+
+                    keys.add(key);
+                    obj.put(key, value);
+                }
+                json.add(obj);
+            }
         
         }
+        // end of inserted code
         catch (Exception e) { e.printStackTrace(); }
         
         /* Encode JSON Data and Return */
